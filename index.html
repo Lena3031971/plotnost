@@ -1,0 +1,1132 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Плотность — интерактивный рабочий лист (7 класс)</title>
+<style>
+  :root{
+    --beige:#faf5ec;
+    --blue:#2b4c9b;
+    --blue-dark:#1f3a7a;
+    --purple:#6c3fc5;
+    --ink:#2a2a35;
+    --muted:#5c5c6e;
+    --green:#1f8a4c;
+    --red:#c0392b;
+    --shadow:0 6px 20px rgba(43,76,155,.09), 0 2px 6px rgba(0,0,0,.04);
+    --shadow-lg:0 14px 34px rgba(56,52,140,.22);
+    --radius:18px;
+  }
+
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+
+  body{
+    margin:0;
+    font-family:"Segoe UI", system-ui, -apple-system, "Helvetica Neue", Arial, sans-serif;
+    color:var(--ink);
+    line-height:1.55;
+    -webkit-font-smoothing:antialiased;
+    background:
+      radial-gradient(1100px 480px at 8% -12%, #e9efff 0%, transparent 60%),
+      radial-gradient(900px 420px at 102% -2%, #f4ecff 0%, transparent 58%),
+      var(--beige);
+    background-attachment:fixed;
+  }
+
+  .wrap{max-width:980px;margin:0 auto;padding:18px 14px 70px;}
+
+  /* ---------- HERO ---------- */
+  .hero{
+    position:relative;overflow:hidden;
+    background:linear-gradient(135deg,#2b4c9b 0%,#4a3fb0 55%,#6c3fc5 100%);
+    color:#fff;
+    border-radius:24px;
+    padding:32px 22px;
+    box-shadow:var(--shadow-lg);
+  }
+  .hero::after{
+    content:"";position:absolute;right:-50px;top:-50px;width:200px;height:200px;
+    border-radius:50%;background:rgba(255,255,255,.10);
+  }
+  .hero::before{
+    content:"";position:absolute;right:56px;bottom:-80px;width:150px;height:150px;
+    border-radius:50%;background:rgba(255,255,255,.08);
+  }
+  .hero h1{
+    position:relative;z-index:1;
+    margin:0 0 12px;
+    font-size:clamp(30px,8vw,48px);
+    font-weight:800;
+    letter-spacing:.08em;
+    line-height:1.05;
+  }
+  .hero p{
+    position:relative;z-index:1;
+    margin:0 0 12px;
+    max-width:660px;
+    font-size:clamp(14px,3.6vw,16.5px);
+    color:#e6ebff;
+  }
+  .motto{
+    position:relative;z-index:1;
+    display:inline-block;
+    background:rgba(255,255,255,.16);
+    border:1px solid rgba(255,255,255,.30);
+    padding:9px 16px;
+    border-radius:999px;
+    font-weight:700;
+    color:#fff;
+    font-size:clamp(13px,3.4vw,15px);
+  }
+
+  /* ---------- SECTIONS ---------- */
+  .section-title{
+    display:flex;align-items:center;gap:12px;
+    margin:36px 0 16px;
+    font-size:clamp(18px,4.6vw,24px);
+    font-weight:800;
+    color:#243063;
+    letter-spacing:.02em;
+  }
+  .section-title .ico{
+    flex:0 0 36px;width:36px;height:36px;
+    display:grid;place-items:center;
+    border-radius:12px;
+    background:linear-gradient(135deg,var(--blue),var(--purple));
+    color:#fff;
+    box-shadow:0 6px 16px rgba(80,60,180,.28);
+  }
+  .section-title .ico svg{width:20px;height:20px;display:block;}
+
+  /* ---------- CARDS ---------- */
+  .cards{display:grid;grid-template-columns:1fr;gap:14px;}
+  @media(min-width:660px){ .cards{grid-template-columns:1fr 1fr;} }
+
+  .card{
+    background:#fff;
+    border:1px solid #f0eef8;
+    border-radius:var(--radius);
+    padding:18px;
+    box-shadow:var(--shadow);
+    transition:transform .18s ease, box-shadow .18s ease;
+  }
+  .card:hover{transform:translateY(-3px);box-shadow:0 14px 30px rgba(43,76,155,.15);}
+  .card h3{
+    margin:0 0 8px;
+    font-size:16px;
+    color:var(--blue);
+    display:flex;align-items:center;gap:8px;
+  }
+  .card p{margin:0;color:#48485a;font-size:15px;}
+
+  .card.rule{
+    grid-column:1/-1;
+    background:linear-gradient(135deg,#f4f1ff,#eaf1ff);
+    border:1px solid #ded7fb;
+  }
+  .card.rule h3{color:var(--purple);}
+
+  /* formula display */
+  .formula{
+    text-align:center;
+    font-size:clamp(20px,5vw,26px);
+    color:#3a2f7d;
+    margin:14px 0 10px;
+    font-family:"Cambria","Georgia",serif;
+  }
+  .frac{
+    display:inline-flex;flex-direction:column;
+    vertical-align:middle;text-align:center;
+    font-style:italic;margin:0 3px;line-height:1.15;
+  }
+  .frac > span{padding:0 8px;}
+  .frac > span:last-child{border-top:2px solid currentColor;padding-top:1px;}
+
+  .legend{
+    list-style:none;margin:10px 0 0;padding:0;
+    display:flex;flex-wrap:wrap;gap:8px;
+  }
+  .legend li{
+    background:#f4f2fd;
+    border:1px solid #e6e1fa;
+    border-radius:999px;
+    padding:5px 12px;
+    font-size:14px;
+    color:#3f3f55;
+  }
+  .legend li b{color:var(--purple);}
+
+  .unit-badge{
+    display:inline-block;
+    background:#eef2ff;
+    border:1px solid #dbe3ff;
+    color:var(--blue);
+    border-radius:8px;
+    padding:2px 8px;
+    font-weight:700;
+    font-size:14px;
+    margin:2px 3px 2px 0;
+  }
+
+  /* ---------- REGISTRATION ---------- */
+  .reg-card{
+    background:#fff;
+    border:1px solid #f0eef8;
+    border-radius:var(--radius);
+    padding:20px;
+    box-shadow:var(--shadow);
+    position:relative;
+    overflow:hidden;
+  }
+  .reg-card::before{
+    content:"";position:absolute;left:0;top:0;bottom:0;width:5px;
+    background:linear-gradient(180deg,var(--blue),var(--purple));
+  }
+  .reg-grid{
+    display:grid;grid-template-columns:1fr;gap:14px;
+  }
+  @media(min-width:640px){
+    .reg-grid{grid-template-columns:2fr 1fr;}
+  }
+  .reg-field{display:flex;flex-direction:column;gap:7px;}
+  .reg-field label{
+    font-size:13.5px;font-weight:800;color:#3a3a52;
+    letter-spacing:.02em;text-transform:uppercase;
+  }
+  .reg-field input{
+    padding:12px 14px;
+    border-radius:12px;
+    border:2px solid #dcd9ee;
+    background:#fdfcff;
+    font-size:16px;
+    font-family:inherit;
+    color:var(--ink);
+    outline:none;
+    transition:border-color .2s ease, box-shadow .2s ease;
+  }
+  .reg-field input::placeholder{color:#a9a9bd;}
+  .reg-field input:focus{
+    border-color:var(--purple);
+    box-shadow:0 0 0 4px rgba(108,63,197,.13);
+  }
+  .reg-field input.error{
+    border-color:var(--red);
+    animation:shake .35s ease;
+  }
+  @keyframes shake{
+    0%,100%{transform:translateX(0);}
+    20%{transform:translateX(-5px);}
+    60%{transform:translateX(5px);}
+  }
+  .reg-note{
+    margin:12px 0 0;font-size:13.5px;color:var(--muted);
+    display:flex;align-items:center;gap:8px;
+  }
+  .reg-note svg{flex:0 0 16px;width:16px;height:16px;color:var(--purple);}
+
+  /* ---------- EXAMPLES ---------- */
+  .ex-card{display:flex;gap:14px;align-items:flex-start;}
+  .ex-icon{
+    flex:0 0 58px;width:58px;height:58px;
+    border-radius:16px;
+    display:grid;place-items:center;
+    background:#f4f1ff;
+    border:1px solid #e9e3fb;
+  }
+  .ex-icon svg{width:42px;height:42px;display:block;}
+
+  /* ---------- PRACTICE ---------- */
+  .progress-wrap{
+    background:#fff;border:1px solid #f0eef8;border-radius:16px;
+    padding:14px 16px;box-shadow:var(--shadow);margin-bottom:16px;
+  }
+  .progress-label{
+    display:flex;justify-content:space-between;align-items:center;
+    font-size:14.5px;color:var(--muted);font-weight:600;
+  }
+  .progress-label b{color:var(--purple);font-size:16px;}
+  .progress-bar{
+    height:10px;border-radius:999px;background:#eceaf6;overflow:hidden;margin-top:9px;
+  }
+  .progress-bar span{
+    display:block;height:100%;width:0;border-radius:999px;
+    background:linear-gradient(90deg,var(--blue),var(--purple));
+    transition:width .35s ease;
+  }
+
+  details.task{
+    background:#fff;
+    border:1px solid #ecebf6;
+    border-radius:16px;
+    margin-bottom:12px;
+    box-shadow:var(--shadow);
+    overflow:hidden;
+    transition:box-shadow .2s ease, border-color .2s ease, background .2s ease;
+  }
+  details.task[open]{box-shadow:0 10px 28px rgba(43,76,155,.14);}
+  details.task.solved{border-color:#b7e3c9;background:#fbfffc;}
+
+  summary{
+    list-style:none;
+    cursor:pointer;
+    padding:15px 16px;
+    display:flex;align-items:center;gap:12px;
+    font-weight:700;
+    color:#2f2f42;
+    user-select:none;
+    transition:background .18s ease;
+    flex-wrap:wrap;
+  }
+  summary::-webkit-details-marker{display:none;}
+  summary:hover{background:#faf9ff;}
+  summary::after{
+    content:"▾";
+    color:var(--purple);
+    font-size:1.05em;
+    transition:transform .25s ease;
+  }
+  details[open] summary::after{transform:rotate(180deg);}
+
+  .badge{
+    flex:0 0 30px;width:30px;height:30px;
+    display:grid;place-items:center;
+    border-radius:10px;
+    background:linear-gradient(135deg,var(--blue),var(--purple));
+    color:#fff;font-size:14px;font-weight:800;
+    box-shadow:0 4px 10px rgba(80,60,180,.28);
+  }
+  details.task.solved .badge{
+    background:linear-gradient(135deg,#1f8a4c,#33b06a);
+    box-shadow:0 4px 10px rgba(31,138,76,.3);
+  }
+  .sum-text{flex:1 1 auto;font-size:15px;min-width:140px;}
+  .type-chip{
+    flex:0 0 auto;
+    font-size:11.5px;font-weight:800;
+    padding:4px 10px;border-radius:999px;
+    background:#eef2ff;color:var(--blue);
+    border:1px solid #dbe3ff;
+    letter-spacing:.03em;white-space:nowrap;
+    margin-right:6px;
+  }
+  @media(max-width:420px){
+    .type-chip{display:none;}
+  }
+
+  .task-body{padding:0 16px 18px;}
+  .q{margin:4px 0 0;color:#46465a;font-size:15px;}
+  .q b{color:var(--blue-dark);}
+
+  .answer-row{
+    display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-top:14px;
+  }
+  input.ans{
+    flex:1 1 130px;min-width:110px;max-width:190px;
+    padding:11px 14px;
+    border-radius:12px;
+    border:2px solid #dcd9ee;
+    background:#fdfcff;
+    font-size:16px;font-family:inherit;color:var(--ink);
+    outline:none;
+    transition:border-color .2s ease, box-shadow .2s ease;
+  }
+  input.ans::placeholder{color:#a9a9bd;}
+  input.ans:focus{border-color:var(--purple);box-shadow:0 0 0 4px rgba(108,63,197,.13);}
+  .unit{
+    font-weight:700;color:var(--muted);font-size:15px;
+    background:#f4f3fb;border-radius:9px;padding:8px 12px;
+  }
+
+  button{
+    font-family:inherit;cursor:pointer;border:none;font-weight:700;
+    transition:transform .15s ease, box-shadow .2s ease, filter .2s ease, background .2s ease;
+  }
+  .btn-check{
+    padding:11px 22px;border-radius:12px;font-size:15px;color:#fff;
+    background:linear-gradient(135deg,var(--blue),var(--purple));
+    box-shadow:0 6px 16px rgba(70,60,180,.28);
+  }
+  .btn-check:hover{filter:brightness(1.08);transform:translateY(-1px);}
+  .btn-check:active{transform:translateY(0);}
+
+  .feedback{
+    margin-top:13px;
+    padding:12px 15px;
+    border-radius:12px;
+    font-size:14.5px;
+    font-weight:600;
+    animation:pop .25s ease;
+  }
+  .feedback.ok{background:#e9f8ef;color:#166b3c;border:1px solid #b9e3c9;}
+  .feedback.err{background:#fdecea;color:#a3271a;border:1px solid #f5c2bb;}
+  @keyframes pop{from{opacity:0;transform:translateY(-5px);}to{opacity:1;transform:none;}}
+
+  /* ---------- FINISH ---------- */
+  .finish-box{text-align:center;margin-top:26px;}
+  .btn-finish{
+    padding:17px 38px;
+    border-radius:16px;
+    font-size:17px;
+    color:#fff;
+    background:linear-gradient(135deg,var(--blue),var(--purple));
+    box-shadow:0 12px 28px rgba(70,60,180,.32);
+    letter-spacing:.02em;
+  }
+  .btn-finish:hover{filter:brightness(1.08);transform:translateY(-2px);}
+  .btn-finish:active{transform:translateY(0);}
+  .finish-warning{
+    margin-top:12px;font-size:14px;color:var(--red);font-weight:700;
+    display:none;
+  }
+  .finish-warning.show{display:block;animation:pop .25s ease;}
+
+  /* ---------- MODAL ---------- */
+  .overlay{
+    position:fixed;inset:0;z-index:100;
+    background:rgba(26,24,48,.58);
+    backdrop-filter:blur(3px);
+    display:flex;align-items:center;justify-content:center;
+    padding:16px;
+    animation:fade .2s ease;
+  }
+  .overlay[hidden]{display:none;}
+  @keyframes fade{from{opacity:0;}to{opacity:1;}}
+
+  .modal{
+    width:100%;max-width:480px;
+    background:#fffdf9;
+    border-radius:22px;
+    overflow:hidden;
+    box-shadow:0 26px 64px rgba(16,16,45,.4);
+    animation:up .32s cubic-bezier(.2,.9,.3,1.25);
+    max-height:92vh;overflow-y:auto;
+  }
+  @keyframes up{from{opacity:0;transform:translateY(24px) scale(.96);}to{opacity:1;transform:none;}}
+
+  .modal-head{
+    padding:26px 22px 20px;
+    text-align:center;
+    background:linear-gradient(135deg,#2b4c9b,#6c3fc5);
+    color:#fff;
+  }
+  .grade-ring{
+    width:88px;height:88px;margin:0 auto 14px;
+    border-radius:50%;
+    display:grid;place-items:center;
+    font-size:38px;font-weight:800;
+    background:rgba(255,255,255,.18);
+    border:3px solid rgba(255,255,255,.55);
+    box-shadow:0 8px 22px rgba(0,0,0,.18);
+  }
+  .modal-head h3{margin:0 0 8px;font-size:21px;font-weight:800;}
+  .modal-head p{margin:0;font-size:15px;color:#e7ebff;font-weight:600;}
+
+  .modal-body{padding:20px 22px 6px;}
+  .student-card{
+    background:#f4f2fd;
+    border:1px solid #e6e1fa;
+    border-radius:14px;
+    padding:12px 16px;
+    margin-bottom:16px;
+    font-size:14.5px;
+    color:#3a3a52;
+  }
+  .student-card div{margin-bottom:3px;}
+  .student-card div:last-child{margin-bottom:0;}
+  .student-card b{color:var(--purple);}
+
+  .rec-title{margin:0 0 8px;font-weight:800;color:#3a3a52;font-size:15px;}
+  .rec-list{margin:0;padding-left:20px;color:#4b4b60;font-size:14.5px;}
+  .rec-list li{margin-bottom:7px;}
+
+  .modal-actions{
+    display:flex;gap:10px;flex-wrap:wrap;
+    padding:18px 22px 24px;
+  }
+  .modal-actions button{flex:1 1 140px;padding:13px 18px;border-radius:13px;font-size:15px;}
+  .btn-primary{
+    color:#fff;
+    background:linear-gradient(135deg,var(--blue),var(--purple));
+    box-shadow:0 8px 20px rgba(70,60,180,.3);
+  }
+  .btn-primary:hover{filter:brightness(1.08);transform:translateY(-1px);}
+  .btn-ghost{
+    background:#f1f0f9;color:#3b3b55;border:1px solid #e2e0f0;
+  }
+  .btn-ghost:hover{background:#e9e7f6;}
+
+  /* ---------- REMEMBER ---------- */
+  .remember .card{
+    display:flex;gap:12px;align-items:flex-start;
+    background:linear-gradient(135deg,#ffffff,#fbf9ff);
+  }
+  .remember .dot{
+    flex:0 0 34px;width:34px;height:34px;border-radius:11px;
+    display:grid;place-items:center;
+    background:linear-gradient(135deg,#2b4c9b,#6c3fc5);
+    color:#fff;
+  }
+  .remember .dot svg{width:18px;height:18px;display:block;}
+  .remember strong{display:block;color:#2f2f45;font-size:14.5px;line-height:1.4;}
+
+  footer{
+    text-align:center;color:#8d8da3;font-size:13px;
+    margin-top:38px;
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    *{animation:none !important;transition:none !important;}
+  }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+
+  <!-- ================= HERO ================= -->
+  <header class="hero">
+    <h1>ПЛОТНОСТЬ</h1>
+    <p>
+      Плотность показывает, какая масса вещества содержится в единице объёма.
+      Она помогает сравнивать разные вещества между собой: одно и то же тело из разных
+      материалов будет весить по-разному.
+    </p>
+    <p class="motto">Плотность помогает понять мир вокруг нас!</p>
+  </header>
+
+  <main>
+
+    <!-- ================= РЕГИСТРАЦИЯ ================= -->
+    <section id="register" aria-labelledby="register-title">
+      <h2 class="section-title" id="register-title">
+        <span class="ico" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+            <circle cx="12" cy="7" r="4"/>
+          </svg>
+        </span>
+        Регистрация
+      </h2>
+
+      <div class="reg-card">
+        <div class="reg-grid">
+          <div class="reg-field">
+            <label for="fio">ФИО ученика</label>
+            <input id="fio" type="text" autocomplete="name"
+                   placeholder="Например: Иванов Иван Иванович">
+          </div>
+          <div class="reg-field">
+            <label for="group">Группа / класс</label>
+            <input id="group" type="text" autocomplete="off"
+                   placeholder="Например: 7А">
+          </div>
+        </div>
+        <p class="reg-note">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"/>
+            <path d="M12 16v-4M12 8h.01"/>
+          </svg>
+          Заполните поля — данные попадут в итоговый отчёт по работе.
+        </p>
+      </div>
+    </section>
+
+    <!-- ================= ТЕОРИЯ ================= -->
+    <section id="theory" aria-labelledby="theory-title">
+      <h2 class="section-title" id="theory-title">
+        <span class="ico" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H19v16H6.5A2.5 2.5 0 0 0 4 21.5z"/>
+            <path d="M4 5.5v16"/>
+          </svg>
+        </span>
+        Теория и формулы
+      </h2>
+
+      <div class="cards">
+
+        <article class="card">
+          <h3>📘 Определение</h3>
+          <p>
+            <b>Плотность</b> — это физическая величина, равная отношению массы тела
+            к его объёму. Она показывает, какая масса вещества содержится в единице объёма.
+          </p>
+        </article>
+
+        <article class="card">
+          <h3>🧮 Основная формула</h3>
+          <div class="formula">ρ = <span class="frac"><span>m</span><span>V</span></span></div>
+          <ul class="legend">
+            <li><b>ρ</b> — плотность</li>
+            <li><b>m</b> — масса</li>
+            <li><b>V</b> — объём</li>
+          </ul>
+        </article>
+
+        <article class="card">
+          <h3>🔄 Производные формулы</h3>
+          <div class="formula">m = ρ · V</div>
+          <div class="formula">V = <span class="frac"><span>m</span><span>ρ</span></span></div>
+          <p>Их получают из основной формулы — они нужны для расчёта массы и объёма.</p>
+        </article>
+
+        <article class="card">
+          <h3>📏 Единицы измерения</h3>
+          <p>
+            Основная единица в СИ — <span class="unit-badge">кг/м³</span>.<br>
+            Часто используют:
+            <span class="unit-badge">г/см³</span>
+            <span class="unit-badge">кг/л</span>
+          </p>
+          <ul class="legend" style="margin-top:12px">
+            <li>1 г/см³ = 1000 кг/м³</li>
+            <li>1 кг/л = 1000 кг/м³</li>
+          </ul>
+        </article>
+
+        <article class="card rule">
+          <h3>⭐ Ключевое правило</h3>
+          <p>
+            <b>Чем больше плотность, тем тяжелее вещество при одинаковом объёме.</b>
+          </p>
+        </article>
+
+      </div>
+    </section>
+
+    <!-- ================= ПРИМЕРЫ ================= -->
+    <section id="examples" aria-labelledby="examples-title">
+      <h2 class="section-title" id="examples-title">
+        <span class="ico" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="9"/>
+            <path d="M3 12h18M12 3a15 15 0 0 1 0 18M12 3a15 15 0 0 0 0 18"/>
+          </svg>
+        </span>
+        Примеры из жизни
+      </h2>
+
+      <div class="cards">
+
+        <article class="card ex-card">
+          <span class="ex-icon" aria-hidden="true">
+            <svg viewBox="0 0 48 48">
+              <rect x="5" y="15" width="34" height="20" rx="4" fill="#c98b4b"/>
+              <rect x="5" y="15" width="34" height="6" rx="3" fill="#e2ac6a"/>
+              <ellipse cx="39" cy="25" rx="4" ry="10" fill="#a86f37"/>
+              <ellipse cx="39" cy="25" rx="1.6" ry="5" fill="#8d5a2a"/>
+            </svg>
+          </span>
+          <div>
+            <h3>Дерево и вода</h3>
+            <p>Плотность дерева меньше плотности воды, поэтому деревянный брусок не тонет.</p>
+          </div>
+        </article>
+
+        <article class="card ex-card">
+          <span class="ex-icon" aria-hidden="true">
+            <svg viewBox="0 0 48 48">
+              <rect x="9" y="9" width="30" height="30" rx="8" fill="#bfe6f7" stroke="#7cc5e8" stroke-width="2"/>
+              <rect x="15" y="15" width="11" height="7" rx="3" fill="#eaf8ff"/>
+            </svg>
+          </span>
+          <div>
+            <h3>Лёд и вода</h3>
+            <p>Плотность льда (900 кг/м³) меньше плотности воды, поэтому лёд плавает на её поверхности.</p>
+          </div>
+        </article>
+
+        <article class="card ex-card">
+          <span class="ex-icon" aria-hidden="true">
+            <svg viewBox="0 0 48 48">
+              <polygon points="24,5 34,11 34,22 24,28 14,22 14,11" fill="#9aa3b2"/>
+              <polygon points="24,5 34,11 24,17 14,11" fill="#b6bec9"/>
+              <rect x="20" y="26" width="8" height="17" rx="2" fill="#7d8798"/>
+              <line x1="20.8" y1="32" x2="27.2" y2="32" stroke="#5f6877" stroke-width="1.6"/>
+              <line x1="20.8" y1="37" x2="27.2" y2="37" stroke="#5f6877" stroke-width="1.6"/>
+            </svg>
+          </span>
+          <div>
+            <h3>Сталь</h3>
+            <p>Плотность стали очень большая (7800 кг/м³), поэтому стальной болт такой тяжёлый для своего размера.</p>
+          </div>
+        </article>
+
+        <article class="card ex-card">
+          <span class="ex-icon" aria-hidden="true">
+            <svg viewBox="0 0 48 48">
+              <ellipse cx="24" cy="17" rx="12" ry="14" fill="#e05a6b"/>
+              <ellipse cx="19" cy="12" rx="3.5" ry="5" fill="#f2909c" opacity=".85"/>
+              <path d="M21 31h6l-3 5z" fill="#b84455"/>
+              <path d="M24 36q6 5 0 10" stroke="#8a8a95" stroke-width="1.6" fill="none" stroke-linecap="round"/>
+            </svg>
+          </span>
+          <div>
+            <h3>Воздух и воздушный шар</h3>
+            <p>Тёплый воздух внутри шара имеет меньшую плотность, чем холодный снаружи, поэтому шар поднимается.</p>
+          </div>
+        </article>
+
+      </div>
+    </section>
+
+    <!-- ================= ПРАКТИКА ================= -->
+    <section id="practice" aria-labelledby="practice-title">
+      <h2 class="section-title" id="practice-title">
+        <span class="ico" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M9 11l3 3L22 4"/>
+            <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>
+          </svg>
+        </span>
+        Практика
+      </h2>
+
+      <div class="progress-wrap">
+        <div class="progress-label">
+          <span>Решено заданий</span>
+          <b id="progText">0 / 10</b>
+        </div>
+        <div class="progress-bar"><span id="progFill"></span></div>
+      </div>
+
+      <div id="tasks"><!-- задания генерируются скриптом --></div>
+
+      <div class="finish-box">
+        <button class="btn-finish" id="finishBtn" type="button">Завершить работу</button>
+        <p class="finish-warning" id="finishWarning">
+          ⚠️ Сначала заполните форму регистрации (ФИО и группа).
+        </p>
+      </div>
+    </section>
+
+    <!-- ================= ЗАПОМНИ ================= -->
+    <section id="remember" aria-labelledby="remember-title" class="remember">
+      <h2 class="section-title" id="remember-title">
+        <span class="ico" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 3l2.6 5.6 6.1.8-4.5 4.2 1.2 6-5.4-3-5.4 3 1.2-6L3.3 9.4l6.1-.8z"/>
+          </svg>
+        </span>
+        Запомни!
+      </h2>
+
+      <div class="cards">
+        <article class="card">
+          <span class="dot" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M5 12h14M12 5v14"/>
+            </svg>
+          </span>
+          <strong>Плотность — это масса в единице объёма.</strong>
+        </article>
+
+        <article class="card">
+          <span class="dot" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M4 7h16M4 12h16M4 17h10"/>
+            </svg>
+          </span>
+          <strong>Единицы измерения: кг/м³, г/см³, кг/л.</strong>
+        </article>
+
+        <article class="card">
+          <span class="dot" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 3v18M6 9l6-6 6 6"/>
+            </svg>
+          </span>
+          <strong>Чем больше плотность, тем тяжелее вещество при одинаковом объёме.</strong>
+        </article>
+      </div>
+    </section>
+
+  </main>
+
+  <footer>Интерактивный рабочий лист по физике · 7 класс · тема «Плотность»</footer>
+</div>
+
+<!-- ================= МОДАЛЬНОЕ ОКНО ================= -->
+<div class="overlay" id="overlay" hidden>
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <div class="modal-head">
+      <div class="grade-ring" id="gradeRing">5</div>
+      <h3 id="modalTitle">Ваша оценка: 5</h3>
+      <p id="modalScore">Вы правильно решили 10 из 10 заданий (100 %)</p>
+    </div>
+    <div class="modal-body">
+      <div class="student-card" id="studentCard">
+        <div><b>ФИО:</b> <span id="modalFio">—</span></div>
+        <div><b>Группа:</b> <span id="modalGroup">—</span></div>
+      </div>
+      <p class="rec-title">Рекомендации:</p>
+      <ul class="rec-list" id="recList"></ul>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-primary" id="restartBtn" type="button">Начать заново</button>
+      <button class="btn-ghost" id="closeBtn" type="button">Закрыть</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(function () {
+  "use strict";
+
+  /* ================= ДАННЫЕ ЗАДАНИЙ (10 штук) ================= */
+  const tasks = [
+    /* ---- Тип 1: расчёт плотности (ρ = m / V) ---- */
+    {
+      id: "t1", type: 1,
+      title: "Найди плотность вещества",
+      text: "Найди плотность вещества, если масса тела равна <b>54 г</b>, а объём — <b>20 см³</b>.",
+      unit: "г/см³",
+      answer: 2.7,
+      success: "ρ = m / V = 54 г : 20 см³ = 2,7 г/см³.",
+      hint: "Используй формулу ρ = m / V. 54 : 20 = 2,7 г/см³."
+    },
+    {
+      id: "t2", type: 1,
+      title: "Найди плотность тела",
+      text: "Масса тела <b>200 г</b>, объём <b>50 см³</b>. Чему равна плотность?",
+      unit: "г/см³",
+      answer: 4,
+      success: "ρ = 200 г : 50 см³ = 4 г/см³.",
+      hint: "Формула ρ = m / V: 200 : 50 = 4 г/см³."
+    },
+    {
+      id: "t3", type: 1,
+      title: "Найди плотность вещества",
+      text: "Тело имеет массу <b>180 г</b> и объём <b>60 см³</b>. Найди плотность.",
+      unit: "г/см³",
+      answer: 3,
+      success: "ρ = 180 г : 60 см³ = 3 г/см³.",
+      hint: "ρ = m / V: 180 : 60 = 3 г/см³."
+    },
+    {
+      id: "t4", type: 1,
+      title: "Найди плотность в кг/м³",
+      text: "Масса тела <b>2,4 кг</b>, объём <b>0,003 м³</b>. Найди плотность в кг/м³.",
+      unit: "кг/м³",
+      answer: 800,
+      success: "ρ = 2,4 кг : 0,003 м³ = 800 кг/м³.",
+      hint: "Используй ρ = m / V: 2,4 : 0,003 = 800 кг/м³."
+    },
+
+    /* ---- Тип 2: расчёт массы (m = ρ · V) ---- */
+    {
+      id: "t5", type: 2,
+      title: "Найди массу детали",
+      text: "Плотность алюминия <b>2700 кг/м³</b>, объём детали <b>0,2 м³</b>. Найди массу детали.",
+      unit: "кг",
+      answer: 540,
+      success: "m = ρ · V = 2700 кг/м³ · 0,2 м³ = 540 кг.",
+      hint: "Используй формулу m = ρ · V: 2700 · 0,2 = 540 кг."
+    },
+    {
+      id: "t6", type: 2,
+      title: "Найди массу вещества",
+      text: "Вещество имеет плотность <b>800 кг/м³</b>, объём <b>1,5 м³</b>. Чему равна масса?",
+      unit: "кг",
+      answer: 1200,
+      success: "m = 800 кг/м³ · 1,5 м³ = 1200 кг.",
+      hint: "Формула m = ρ · V: 800 · 1,5 = 1200 кг."
+    },
+    {
+      id: "t7", type: 2,
+      title: "Найди массу стальной детали",
+      text: "Плотность стали <b>7,8 г/см³</b>, объём детали <b>30 см³</b>. Найди массу в граммах.",
+      unit: "г",
+      answer: 234,
+      success: "m = 7,8 г/см³ · 30 см³ = 234 г.",
+      hint: "m = ρ · V: 7,8 · 30 = 234 г."
+    },
+
+    /* ---- Тип 3: расчёт объёма (V = m / ρ) ---- */
+    {
+      id: "t8", type: 3,
+      title: "Найди объём куска железа",
+      text: "Масса куска железа <b>780 кг</b>, плотность <b>7800 кг/м³</b>. Найди объём.",
+      unit: "м³",
+      answer: 0.1,
+      success: "V = m / ρ = 780 кг : 7800 кг/м³ = 0,1 м³.",
+      hint: "Используй формулу V = m / ρ: 780 : 7800 = 0,1 м³."
+    },
+    {
+      id: "t9", type: 3,
+      title: "Найди объём тела",
+      text: "Тело массой <b>100 г</b> имеет плотность <b>2 г/см³</b>. Чему равен объём?",
+      unit: "см³",
+      answer: 50,
+      success: "V = m / ρ = 100 г : 2 г/см³ = 50 см³.",
+      hint: "Формула V = m / ρ: 100 : 2 = 50 см³."
+    },
+    {
+      id: "t10", type: 3,
+      title: "Найди объём масла",
+      text: "Масса масла <b>4,5 кг</b>, плотность <b>900 кг/м³</b>. Найди объём в м³.",
+      unit: "м³",
+      answer: 0.005,
+      success: "V = 4,5 кг : 900 кг/м³ = 0,005 м³.",
+      hint: "V = m / ρ: 4,5 : 900 = 0,005 м³."
+    }
+  ];
+
+  /* Типы заданий — подписи для чипов */
+  const typeLabels = {
+    1: "ρ = m / V",
+    2: "m = ρ · V",
+    3: "V = m / ρ"
+  };
+
+  /* ================= СОСТОЯНИЕ ================= */
+  const state = {};          // id -> "ok" | "err" | null
+  tasks.forEach(t => { state[t.id] = null; });
+
+  /* ================= DOM ================= */
+  const tasksEl    = document.getElementById("tasks");
+  const progText   = document.getElementById("progText");
+  const progFill   = document.getElementById("progFill");
+  const overlay    = document.getElementById("overlay");
+  const gradeRing  = document.getElementById("gradeRing");
+  const modalTitle = document.getElementById("modalTitle");
+  const modalScore = document.getElementById("modalScore");
+  const recList    = document.getElementById("recList");
+  const modalFio   = document.getElementById("modalFio");
+  const modalGroup = document.getElementById("modalGroup");
+  const fioInput   = document.getElementById("fio");
+  const groupInput = document.getElementById("group");
+  const finishWarn = document.getElementById("finishWarning");
+
+  /* ================= ОТРИСОВКА ЗАДАНИЙ ================= */
+  tasks.forEach(function (t, i) {
+    const d = document.createElement("details");
+    d.className = "task";
+    d.dataset.id = t.id;
+    d.innerHTML =
+      '<summary>' +
+        '<span class="badge">' + (i + 1) + '</span>' +
+        '<span class="sum-text">' + t.title + '</span>' +
+        '<span class="type-chip">' + typeLabels[t.type] + '</span>' +
+      '</summary>' +
+      '<div class="task-body">' +
+        '<p class="q">' + t.text + '</p>' +
+        '<div class="answer-row">' +
+          '<input class="ans" type="text" inputmode="decimal" autocomplete="off" ' +
+                 'placeholder="Твой ответ" aria-label="Ответ к заданию ' + (i + 1) + '">' +
+          '<span class="unit">' + t.unit + '</span>' +
+          '<button class="btn-check" type="button">Проверить</button>' +
+        '</div>' +
+        '<div class="feedback" hidden></div>' +
+      '</div>';
+
+    tasksEl.appendChild(d);
+
+    const btn   = d.querySelector(".btn-check");
+    const input = d.querySelector(".ans");
+
+    btn.addEventListener("click", function () { checkTask(t.id); });
+    input.addEventListener("keydown", function (e) {
+      if (e.key === "Enter") { e.preventDefault(); checkTask(t.id); }
+    });
+  });
+
+  /* ================= УТИЛИТЫ ================= */
+  function parseNumber(str) {
+    if (typeof str !== "string") return NaN;
+    const cleaned = str.trim().replace(/\s+/g, "").replace(",", ".");
+    if (cleaned === "") return NaN;
+    const v = Number(cleaned);
+    return Number.isFinite(v) ? v : NaN;
+  }
+
+  function showFeedback(el, kind, html) {
+    el.className = "feedback " + kind;
+    el.innerHTML = html;
+    el.hidden = false;
+  }
+
+  /* ================= ПРОВЕРКА ЗАДАНИЯ ================= */
+  function checkTask(id) {
+    const task = tasks.find(function (t) { return t.id === id; });
+    const box  = document.querySelector('details.task[data-id="' + id + '"]');
+    const input= box.querySelector(".ans");
+    const fb   = box.querySelector(".feedback");
+
+    const value = parseNumber(input.value);
+
+    if (Number.isNaN(value)) {
+      showFeedback(fb, "err", "⚠️ Введи числовой ответ (например: 2,7 или 2.7).");
+      return;
+    }
+
+    const tolerance = Math.max(0.0001, Math.abs(task.answer) * 0.01); // 1 %
+
+    if (Math.abs(value - task.answer) <= tolerance) {
+      state[id] = "ok";
+      box.classList.add("solved");
+      showFeedback(fb, "ok", "✅ <b>Верно!</b> " + task.success);
+    } else {
+      state[id] = "err";
+      box.classList.remove("solved");
+      showFeedback(fb, "err", "❌ <b>Ошибка. Попробуй ещё раз.</b> " + task.hint);
+    }
+
+    updateProgress();
+  }
+
+  /* ================= ПРОГРЕСС ================= */
+  function updateProgress() {
+    const solved = tasks.filter(function (t) { return state[t.id] === "ok"; }).length;
+    progText.textContent = solved + " / " + tasks.length;
+    progFill.style.width = (solved / tasks.length * 100) + "%";
+  }
+
+  /* ================= ПРОВЕРКА РЕГИСТРАЦИИ ================= */
+  function validateRegistration() {
+    let ok = true;
+    const fio = fioInput.value.trim();
+    const grp = groupInput.value.trim();
+
+    if (!fio) {
+      fioInput.classList.add("error");
+      setTimeout(function(){ fioInput.classList.remove("error"); }, 700);
+      ok = false;
+    }
+    if (!grp) {
+      groupInput.classList.add("error");
+      setTimeout(function(){ groupInput.classList.remove("error"); }, 700);
+      ok = false;
+    }
+    return ok;
+  }
+
+  /* ================= ФИНАЛЬНЫЙ ТЕСТ ================= */
+  function finishWork() {
+    /* Проверка регистрации */
+    if (!validateRegistration()) {
+      finishWarn.classList.add("show");
+      document.getElementById("register").scrollIntoView({ behavior: "smooth", block: "center" });
+      setTimeout(function(){ finishWarn.classList.remove("show"); }, 2600);
+      return;
+    }
+    finishWarn.classList.remove("show");
+
+    /* Подсчёт результатов */
+    const total = tasks.length;
+    let correct = 0;
+    const failedTypes = new Set();
+
+    tasks.forEach(function (t) {
+      if (state[t.id] === "ok") {
+        correct++;
+      } else {
+        failedTypes.add(t.type);
+      }
+    });
+
+    const percent = Math.round((correct / total) * 100);
+
+    let grade;
+    if (percent >= 90)      grade = 5;
+    else if (percent >= 75) grade = 4;
+    else if (percent >= 60) grade = 3;
+    else                    grade = 2;
+
+    /* Рекомендации */
+    const recs = [];
+    if (failedTypes.has(1)) {
+      recs.push("Повторите формулу плотности ρ = m / V и перевод единиц: 1 г/см³ = 1000 кг/м³.");
+    }
+    if (failedTypes.has(2)) {
+      recs.push("Выучите формулу массы m = ρ · V — плотность нужно умножать на объём.");
+    }
+    if (failedTypes.has(3)) {
+      recs.push("Выучите формулу объёма V = m / ρ — массу нужно делить на плотность.");
+    }
+    if (correct === 0) {
+      recs.length = 0;
+      recs.push("Сначала разберите блок «Теория и формулы» и решите задания по порядку.");
+    }
+    if (correct === total) {
+      recs.length = 0;
+      recs.push("Отличный результат! Попробуйте задачи, где нужно переводить единицы измерения.");
+    }
+
+    /* Данные ученика */
+    modalFio.textContent   = fioInput.value.trim();
+    modalGroup.textContent = groupInput.value.trim();
+
+    /* Вывод в модальное окно */
+    gradeRing.textContent  = grade;
+    modalTitle.textContent = "Ваша оценка: " + grade;
+    modalScore.textContent = "Вы правильно решили " + correct + " из " + total +
+                             " заданий (" + percent + " %)";
+
+    recList.innerHTML = "";
+    recs.forEach(function (r) {
+      const li = document.createElement("li");
+      li.textContent = r;
+      recList.appendChild(li);
+    });
+
+    overlay.hidden = false;
+    document.body.style.overflow = "hidden";
+  }
+
+  /* ================= СБРОС ================= */
+  function restart() {
+    tasks.forEach(function (t) {
+      state[t.id] = null;
+      const box = document.querySelector('details.task[data-id="' + t.id + '"]');
+      box.classList.remove("solved");
+      box.open = false;
+      const input = box.querySelector(".ans");
+      input.value = "";
+      const fb = box.querySelector(".feedback");
+      fb.hidden = true;
+      fb.className = "feedback";
+      fb.innerHTML = "";
+    });
+
+    fioInput.value = "";
+    groupInput.value = "";
+
+    updateProgress();
+    overlay.hidden = true;
+    document.body.style.overflow = "";
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
+  /* ================= СОБЫТИЯ ================= */
+  document.getElementById("finishBtn").addEventListener("click", finishWork);
+  document.getElementById("restartBtn").addEventListener("click", restart);
+  document.getElementById("closeBtn").addEventListener("click", function () {
+    overlay.hidden = true;
+    document.body.style.overflow = "";
+  });
+  overlay.addEventListener("click", function (e) {
+    if (e.target === overlay) {
+      overlay.hidden = true;
+      document.body.style.overflow = "";
+    }
+  });
+  document.addEventListener("keydown", function (e) {
+    if (e.key === "Escape" && !overlay.hidden) {
+      overlay.hidden = true;
+      document.body.style.overflow = "";
+    }
+  });
+
+  /* Скрываем предупреждение при вводе данных */
+  fioInput.addEventListener("input", function(){ finishWarn.classList.remove("show"); });
+  groupInput.addEventListener("input", function(){ finishWarn.classList.remove("show"); });
+
+  /* ================= СТАРТ ================= */
+  updateProgress();
+})();
+</script>
+</body>
+</html>
